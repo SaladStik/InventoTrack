@@ -1,0 +1,121 @@
+@startuml physical
+
+hide circle
+skinparam linetype ortho
+
+entity Users {
+    * id : INT [PK]
+    --
+    username : VARCHAR(50)
+    email : VARCHAR(255)
+    password_hash : TEXT
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+    company_id : INT [FK]
+}
+
+entity Companies {
+    * id : INT [PK]
+    --
+    name : VARCHAR(255)
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity Inventory {
+    * id : INT [PK]
+    --
+    company_id : INT [FK]
+    name : VARCHAR(255)
+    category_id : INT [FK]
+    is_archived : BOOLEAN
+    retention_period : INT
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity Categories {
+    * id : INT [PK]
+    --
+    name : VARCHAR(255)
+    parent_id : INT [FK]
+    company_id : INT [FK]
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity Stock {
+    * id : INT [PK]
+    --
+    inventory_id : INT [FK]
+    quantity : INT
+    threshold : INT
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity SerialNumbers {
+    * id : INT [PK]
+    --
+    stock_id : INT [FK]
+    serial_number : VARCHAR(255)
+    created_at : TIMESTAMP
+    updated_at : TIMESTAMP
+}
+
+entity CustomFields {
+    * id : INT [PK]
+    --
+    company_id : INT [FK]
+    table_name : VARCHAR(50)
+    field_name : VARCHAR(50)
+    field_type : VARCHAR(50)
+    validation_rules : TEXT
+    created_at : TIMESTAMP
+}
+
+entity Logs {
+    * id : INT [PK]
+    --
+    action : TEXT
+    user_id : INT [FK]
+    entity : VARCHAR(50)
+    entity_id : INT
+    details : TEXT
+    created_at : TIMESTAMP
+}
+
+entity Backups {
+    * id : INT [PK]
+    --
+    company_id : INT [FK]
+    backup_time : TIMESTAMP
+    backup_path : TEXT
+    restored : BOOLEAN
+}
+
+entity RecycleBin {
+    * id : INT [PK]
+    --
+    company_id : INT [FK]
+    table_name : VARCHAR(50)
+    record_id : INT
+    deleted_at : TIMESTAMP
+    retention_period : INT
+}
+
+Users }o--|| Companies : "Belongs to"
+Companies ||--o{ Inventory : "Manages"
+Inventory ||--o{ Stock : "Contains"
+Stock ||--o{ SerialNumbers : "Tracks"
+Companies ||--o{ Categories : "Defines"
+Categories ||--o{ Inventory : "Categorizes"
+Companies ||--o{ CustomFields : "Customizes"
+Users ||--o{ Logs : "Generates"
+Logs ||--|| Inventory : "Tracks changes"
+Logs ||--|| Stock : "Tracks changes"
+Logs ||--|| SerialNumbers : "Tracks changes"
+Logs ||--|| Categories : "Tracks changes"
+Companies ||--o{ Backups : "Stores backups"
+Companies ||--o{ RecycleBin : "Recycles"
+@enduml

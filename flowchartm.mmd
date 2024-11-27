@@ -1,0 +1,70 @@
+flowchart TD
+    Start[User makes an account] --> CreateTenant[System links user to a company_id]
+    CreateTenant --> genericPage[User views their inventory]
+
+    %% Column Management
+    genericPage --> AddColumn[User clicks + to add custom tracking fields]
+    genericPage --> RemoveColumn[User clicks - to remove custom tracking fields]
+    RemoveColumn --> ConfirmDelete[App confirms multiple times before deleting]
+    ConfirmDelete -->|Confirmed| DeleteColumn[Column and associated data moved to recycle bin]
+    DeleteColumn --> RecycleLog[Recycle bin updated for potential recovery]
+    RecycleLog -->|After Retention Period| PermanentDelete[Column data permanently deleted]
+    AddColumn --> ColumnDetails[User enters all required data and validation rules]
+    ColumnDetails --> PreviewColumn[Preview of new column and sample data]
+    PreviewColumn -->|Approved| CreateColumn[Database adds column dynamically with metadata]
+    CreateColumn --> updateLog[Log updated with new column details]
+
+    %% Serial Number Management
+    genericPage --> SerialTracking[User double-clicks on a tracked serial number product]
+    SerialTracking --> ViewSerial[Page displays serial numbers and other tracked data]
+    ViewSerial --> AddSerialField[User clicks + to add tracking data fields]
+    AddSerialField --> ColumnDetails
+    ViewSerial --> RemoveSerialField[User clicks - to remove tracking data fields]
+    RemoveSerialField --> ConfirmDelete
+
+    %% Stock Management
+    genericPage --> AddStock[User adds stock to a product]
+    AddStock -->|Is Tracked| EnterTracking[User enters required tracking data]
+    AddStock -->|Not Tracked| UpdateStock[Quantity added to total stock]
+    EnterTracking --> ValidateTracking[System validates the entered data]
+    ValidateTracking --> UpdateStock
+    UpdateStock --> ThresholdCheck[Check for stock threshold breaches]
+    ThresholdCheck -->|Threshold Breached| Notifications[User notified about low or high stock]
+    UpdateStock --> updateLog[Log updated with stock addition details]
+
+    %% Product Archival
+    genericPage --> ArchiveProduct[User archives a product]
+    ArchiveProduct --> ArchiveRetention[User sets retention period for archival data]
+    ArchiveProduct --> MoveToArchive[Product becomes read-only and moved to archive]
+    MoveToArchive --> ArchiveLog[Log updated with archival details]
+    genericPage --> UnarchiveProduct[User unarchives a product from the archival page]
+    UnarchiveProduct --> MoveToInventory[Product regains write access]
+    MoveToInventory --> updateLog
+
+    %% Dashboards and Reports
+    genericPage --> Dashboard[User views or customizes dashboards]
+    Dashboard --> Widgets[User adds custom widgets for key metrics]
+    Dashboard --> DataVisualization[View trends, graphs, and reports]
+
+    %% Advanced Features
+    genericPage --> CategoryManagement[User manages categories and subcategories]
+    genericPage --> BatchManagement[User manages product batches]
+    genericPage --> AdvancedSearch[Search with multiple criteria and filters]
+    AdvancedSearch --> SearchResults[View filtered inventory]
+
+    %% AI-Driven Recommendations
+    genericPage --> AIRecommendations[AI suggests inventory optimizations]
+    AIRecommendations --> RecommendationsLog[Log updated with recommendations]
+
+    %% Logs and Notifications
+    updateLog --> Logs[Searchable audit trail for all changes]
+    Logs --> Notifications[Optional notifications for critical actions]
+
+    %% Backups and API Integration
+    Logs --> Backup[Data automatically backed up daily]
+    Backup --> Restore[User can restore from backups]
+    Logs --> API[Users integrate inventory with external tools]
+
+    %% Feedback and Support
+    genericPage --> Feedback[User submits feedback or feature requests]
+    Feedback --> SupportTeam[Support team reviews and responds]
