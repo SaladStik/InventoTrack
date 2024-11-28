@@ -1,4 +1,4 @@
---Step 0: Drop the databasse if necessary
+--Step 0: Drop the database if necessary
 --DROP DATABASE IF EXISTS InventoTrack;
 
 -- Step 1: Create the database
@@ -71,22 +71,33 @@ CREATE TABLE SerialNumbers (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- CustomFields Table
-CREATE TABLE CustomFields (
+-- Custom_Fields Table
+CREATE TABLE Custom_Fields (
     id SERIAL PRIMARY KEY,
     company_id INT NOT NULL REFERENCES Companies(id) ON DELETE CASCADE,
-    table_name VARCHAR(50) NOT NULL,
-    field_name VARCHAR(50) NOT NULL,
-    field_type VARCHAR(50) NOT NULL,
-    validation_rules TEXT,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    table_name VARCHAR(50) NOT NULL, -- Table the field applies to (e.g., Inventory, Stock)
+    field_name VARCHAR(50) NOT NULL, -- Name of the custom field
+    field_type VARCHAR(50) NOT NULL CHECK (field_type IN ('text', 'number', 'date', 'boolean')), -- Field type
+    validation_rules TEXT, -- Optional validation rules for the field
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Custom_Field_Values Table
+CREATE TABLE Custom_Field_Values (
+    id SERIAL PRIMARY KEY,
+    custom_field_id INT NOT NULL REFERENCES Custom_Fields(id) ON DELETE CASCADE, -- Links to the custom field definition
+    inventory_id INT NOT NULL REFERENCES Inventory(id) ON DELETE CASCADE, -- Links to the inventory item
+    value TEXT NOT NULL, -- Value of the custom field (stored as text)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Logs Table
 CREATE TABLE Logs (
     id SERIAL PRIMARY KEY,
     action TEXT NOT NULL,
-    user_id INT NOT NULL REFERENCES Users(id) ON DELETE SET NULL,
+    user_id INT REFERENCES Users(id) ON DELETE SET NULL,
     entity VARCHAR(50) NOT NULL,
     entity_id INT NOT NULL,
     details TEXT,
@@ -103,7 +114,7 @@ CREATE TABLE Backups (
 );
 
 -- Recycle Bin Table
-CREATE TABLE RecycleBin (
+CREATE TABLE Recycle_Bins (
     id SERIAL PRIMARY KEY,
     company_id INT NOT NULL REFERENCES Companies(id) ON DELETE CASCADE,
     table_name VARCHAR(50) NOT NULL,

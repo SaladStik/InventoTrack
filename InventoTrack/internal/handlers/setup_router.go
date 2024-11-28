@@ -29,8 +29,12 @@ func SetupRouter() *mux.Router {
 	protected.HandleFunc("/inventory/{id}/unarchive", UnarchiveInventory).Methods("POST") // Unarchive inventory
 
 	// Custom fields routes
-	protected.HandleFunc("/custom-fields", AddCustomField).Methods("POST")           // Add a custom field
-	protected.HandleFunc("/custom-fields/{id}", RemoveCustomField).Methods("DELETE") // Remove a custom field
+	protected.HandleFunc("/custom-fields", AddCustomField).Methods("POST")           // Add a new custom field for a company
+	protected.HandleFunc("/custom-fields/{id}", RemoveCustomField).Methods("DELETE") // Remove a custom field and move it to the recycle bin
+
+	// Custom field values routes
+	protected.HandleFunc("/custom-field-values", AddCustomFieldValue).Methods("POST")            // Add a value to a custom field for a specific entity
+	protected.HandleFunc("/custom-field-values/{entityID}", GetCustomFieldValues).Methods("GET") // Retrieve all custom field values for a specific entity
 
 	// Recycle Bin routes
 	protected.HandleFunc("/recycle-bin", GetRecycleBin).Methods("GET")             // Get recycle bin entries
@@ -39,7 +43,7 @@ func SetupRouter() *mux.Router {
 	// Notifications routes
 	protected.HandleFunc("/notifications", GetNotifications).Methods("GET") // Get notifications
 
-	// Feedback routes
+	// Feedback
 	protected.HandleFunc("/feedback", SubmitFeedback).Methods("POST") // Submit feedback
 
 	// Logs routes
