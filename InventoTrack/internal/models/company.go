@@ -2,10 +2,11 @@ package models
 
 import "time"
 
-// Company represents a company entity
+// Company represents a company in the system
 type Company struct {
-	ID        int       `json:"id" gorm:"primaryKey"`
-	Name      string    `json:"name"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
+	ID        int    `gorm:"primaryKey"`
+	Name      string `gorm:"not null"`
+	OwnerID   *int   `gorm:"unique"` // Pointer to allow null values
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }

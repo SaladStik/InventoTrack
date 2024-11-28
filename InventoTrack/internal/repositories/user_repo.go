@@ -34,7 +34,7 @@ func GetUserByEmail(email string) (*models.User, error) {
 	return &user, nil
 }
 
-// GetUserByUsername retrieves a user by their username
+// GetUserByUsername fetches a user by their username
 func GetUserByUsername(username string) (*models.User, error) {
 	var user models.User
 	result := extensions.DB.Where("username = ?", username).First(&user)

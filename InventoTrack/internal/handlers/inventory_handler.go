@@ -13,7 +13,7 @@ func AddInventory(w http.ResponseWriter, r *http.Request) {
 	var inventoryRequest struct {
 		Name       string `json:"name"`
 		CompanyID  int    `json:"company_id"`
-		CategoryID int    `json:"category_id"`
+		CategoryID *int   `json:"category_id"`
 	}
 
 	// Parse JSON body
@@ -23,7 +23,7 @@ func AddInventory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Call the service to add inventory
-	inventory, err := services.AddInventory(inventoryRequest.Name, inventoryRequest.CompanyID, inventoryRequest.CategoryID)
+	inventory, err := services.AddInventory(r.Context(), inventoryRequest.Name, inventoryRequest.CompanyID, inventoryRequest.CategoryID)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -43,7 +43,7 @@ func GetInventory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Call service to fetch the inventory
-	inventory, err := services.GetInventoryByID(id)
+	inventory, err := services.GetInventoryByID(r.Context(), id)
 	if err != nil {
 		utils.RespondWithError(w, http.StatusNotFound, "Inventory item not found")
 		return
@@ -51,4 +51,42 @@ func GetInventory(w http.ResponseWriter, r *http.Request) {
 
 	// Respond with inventory data
 	utils.RespondWithJSON(w, http.StatusOK, inventory)
+}
+
+// ArchiveInventory handles POST /inventory/{id}/archive
+func ArchiveInventory(w http.ResponseWriter, r *http.Request) {
+	idStr := utils.GetPathParam(r, "id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, "Invalid inventory ID")
+		return
+	}
+
+	// Pass the request context
+	err = services.ArchiveInventory(r.Context(), id)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	utils.RespondWithJSON(w, http.StatusOK, map[string]string{"message": "Inventory item archived"})
+}
+
+// UnarchiveInventory handles POST /inventory/{id}/unarchive
+func UnarchiveInventory(w http.ResponseWriter, r *http.Request) {
+	idStr := utils.GetPathParam(r, "id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusBadRequest, "Invalid inventory ID")
+		return
+	}
+
+	// Pass the request context
+	err = services.UnarchiveInventory(r.Context(), id)
+	if err != nil {
+		utils.RespondWithError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	utils.RespondWithJSON(w, http.StatusOK, map[string]string{"message": "Inventory item unarchived"})
 }

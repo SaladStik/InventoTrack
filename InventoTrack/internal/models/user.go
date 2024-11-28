@@ -4,11 +4,12 @@ import "time"
 
 // User represents a user in the system
 type User struct {
-	ID           int       `json:"id" gorm:"primaryKey"`
-	Username     string    `json:"username"`
-	Email        string    `json:"email"`
-	PasswordHash string    `json:"-"` // Store hashed passwords
-	CompanyID    int       `json:"company_id"`
-	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	ID           int    `gorm:"primaryKey"`
+	Username     string `gorm:"unique;not null"`
+	Email        string `gorm:"unique;not null"`
+	PasswordHash string `gorm:"not null"`
+	Role         string `gorm:"not null"` // owner, admin, user, viewer
+	CompanyID    *int   `gorm:"index"`
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }

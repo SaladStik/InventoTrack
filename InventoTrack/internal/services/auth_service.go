@@ -11,7 +11,6 @@ import (
 
 var jwtSecret = []byte("your_secret_key") // Replace with a strong secret key
 
-// AuthenticateUser verifies username and password, and returns a JWT if valid
 func AuthenticateUser(username, password string) (string, error) {
 	// Fetch the user from the database
 	user, err := repositories.GetUserByUsername(username)
@@ -24,9 +23,10 @@ func AuthenticateUser(username, password string) (string, error) {
 		return "", errors.New("invalid username or password")
 	}
 
-	// Generate a JWT
+	// Generate a JWT with userID and role
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"userID": user.ID,
+		"userID": user.ID,                               // Include the user's ID
+		"role":   user.Role,                             // Include the user's role
 		"exp":    time.Now().Add(24 * time.Hour).Unix(), // Token expires in 24 hours
 	})
 

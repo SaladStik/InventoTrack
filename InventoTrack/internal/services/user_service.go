@@ -9,17 +9,14 @@ import (
 	"gorm.io/gorm"
 )
 
-// CreateUser creates a new user and checks for duplicates
-func CreateUser(username, email, password string, companyID int) (*models.User, error) {
+// CreateUser creates a new user and saves it in the database
+func CreateUser(username, email, password string, companyID int, role string) (*models.User, error) {
 	// Validate inputs
-	if username == "" || email == "" || password == "" || companyID <= 0 {
-		return nil, errors.New("invalid user data")
+	if username == "" || email == "" || password == "" {
+		return nil, errors.New("username, email, and password are required")
 	}
-
-	// Check if the username already exists
-	existingUser, _ := repositories.GetUserByUsername(username)
-	if existingUser != nil {
-		return nil, errors.New("username already exists")
+	if role == "" {
+		role = "user" // Default role
 	}
 
 	// Hash the password
@@ -29,14 +26,16 @@ func CreateUser(username, email, password string, companyID int) (*models.User, 
 	}
 
 	// Create the user object
+	companyIDPointer := &companyID // Convert int to *int
 	user := &models.User{
 		Username:     username,
 		Email:        email,
 		PasswordHash: string(hashedPassword),
-		CompanyID:    companyID,
+		CompanyID:    companyIDPointer,
+		Role:         role,
 	}
 
-	// Save to database
+	// Save the user to the database
 	err = repositories.CreateUser(user)
 	if err != nil {
 		return nil, err

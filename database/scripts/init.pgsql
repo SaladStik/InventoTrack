@@ -1,3 +1,6 @@
+--Step 0: Drop the databasse if necessary
+--DROP DATABASE IF EXISTS InventoTrack;
+
 -- Step 1: Create the database
 -- CREATE DATABASE InventoTrack;
 
@@ -10,6 +13,7 @@
 CREATE TABLE Companies (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+    owner_id INT UNIQUE, -- Owner of the company (linked to Users table)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -42,7 +46,8 @@ CREATE TABLE Users (
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
-    company_id INT NOT NULL REFERENCES Companies(id) ON DELETE CASCADE,
+    company_id INT REFERENCES Companies(id) ON DELETE SET NULL, -- Users can belong to a company
+    role VARCHAR(50) NOT NULL CHECK (role IN ('owner', 'admin', 'user', 'viewer')), -- Role management
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -116,6 +121,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- Apply updated_at triggers
 CREATE TRIGGER update_users_updated_at
 BEFORE UPDATE ON Users
 FOR EACH ROW
